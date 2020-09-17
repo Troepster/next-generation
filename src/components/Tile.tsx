@@ -23,7 +23,6 @@ interface Props {
 
 const Tile: React.FC<Props> = React.memo((props) => {
   const { x, y, alive, onClick } = props;
-  console.log('Render...');
   return <StyledTile alive={alive} onClick={() => onClick(!alive, x, y)} />;
 });
 
