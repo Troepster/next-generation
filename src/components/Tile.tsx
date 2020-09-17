@@ -1,24 +1,30 @@
 import styled from 'styled-components';
-import React, { FC } from 'react';
+import React from 'react';
+import { blue } from '@material-ui/core/colors';
 
-const StyledTile = styled.div`
+const StyledTile = styled.div<{ alive: boolean }>`
   display: flex;
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
   border-bottom: 1px solid;
   border-right: 1px solid;
   border-color: #282c34;
+  background-color: ${({ alive }) => (alive ? blue.A100 : 'transparent')};
+  transition: background-color 0.2s;
 `;
+type OnClickFunction = (alive: boolean, x: number, y: number) => void;
 
 interface Props {
   x: number;
   y: number;
+  alive: boolean;
+  onClick: OnClickFunction;
 }
 
-const Tile: FC<Props> = (props) => {
-  const { x, y } = props;
-  console.log(x, y);
-  return <StyledTile />;
-};
+const Tile: React.FC<Props> = React.memo((props) => {
+  const { x, y, alive, onClick } = props;
+  console.log('Render...');
+  return <StyledTile alive={alive} onClick={() => onClick(!alive, x, y)} />;
+});
 
 export default Tile;

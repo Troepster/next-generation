@@ -1,7 +1,9 @@
 import styled from 'styled-components';
-import { makeSequence } from '../utils/seqGenerator';
-import React from 'react';
+import React, { useCallback } from 'react';
 import Tile from './Tile';
+import { useRecoilState } from 'recoil';
+import { boardAtom } from '../state/atoms';
+import { replaceItemAtIndex } from '../utils/replace';
 
 const Wrapper = styled.div`
   display: flex;
@@ -24,16 +26,28 @@ const Row = styled.div`
   flex-direction: row;
 `;
 
-const Grid = () => {
-  const seq = [...makeSequence(16, 2)];
-  console.log(seq);
+const Grid: React.FC = () => {
+  const [board, setBoard] = useRecoilState(boardAtom);
+
+  console.log(board);
+  const changeTileState = useCallback(
+    (alive: boolean, x: number, y: number) => {
+      setBoard((prevBoard) => {
+        console.log(prevBoard[y][x]);
+        const newBoard = prevBoard.slice(0);
+        newBoard[y] = replaceItemAtIndex(newBoard[y], x, alive ? 1 : 0) as [number];
+        return newBoard as [[number]];
+      });
+    },
+    [setBoard]
+  );
   return (
     <Wrapper>
       <Container>
-        {seq.map((v, x) => (
-          <Row key={x}>
-            {v.map((vv, y) => (
-              <Tile key={y} x={x} y={y} />
+        {board.map((v, y) => (
+          <Row key={y}>
+            {v.map((vv, x) => (
+              <Tile key={x} x={x} y={y} onClick={changeTileState} alive={!!vv} />
             ))}
           </Row>
         ))}

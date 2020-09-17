@@ -1,4 +1,4 @@
-function* makeSequenceFn(max: number, dimensionCount = 1): Generator<[number], any, [number]> {
+function* makeSequenceFn(max: number, dimensionCount = 1): Generator<[number], void, [number]> {
   for (let i = 0; i < max; i++) {
     yield (dimensionCount <= 1
       ? 0
@@ -6,6 +6,6 @@ function* makeSequenceFn(max: number, dimensionCount = 1): Generator<[number], a
   }
 }
 
-export const makeSequence = (max: number, dimensionCount = 1) => {
-  return (makeSequenceFn(max, dimensionCount) as unknown) as [[number]];
+export const makeSequence = (max: number, dimensionCount = 1): [[number]] => {
+  return [...((makeSequenceFn(max, dimensionCount) as unknown) as [[number]])] as [[number]];
 };
