@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React, { useCallback, useEffect, useState } from 'react';
-import Tile from '../Tile';
+import { Tile } from '../Tile';
 import { useRecoilState } from 'recoil';
 import { boardAtom, savedBoardAtom } from '../../state/atoms';
 import { replaceItemAtIndex } from '../../utils/replace';
@@ -87,13 +87,14 @@ const Grid: React.FC = () => {
     };
   }, [calculateNextGeneration, playing]);
 
-  useEffect(() => {
-    changeTileState(true, 8, 8);
-    changeTileState(true, 9, 9);
-    changeTileState(true, 9, 10);
-    changeTileState(true, 8, 10);
-    changeTileState(true, 7, 10);
-  }, [changeTileState]);
+  // Generates a starting state - used for development
+  // useEffect(() => {
+  //   changeTileState(true, 8, 8);
+  //   changeTileState(true, 9, 9);
+  //   changeTileState(true, 9, 10);
+  //   changeTileState(true, 8, 10);
+  //   changeTileState(true, 7, 10);
+  // }, [changeTileState]);
   return (
     <Wrapper>
       <Container>

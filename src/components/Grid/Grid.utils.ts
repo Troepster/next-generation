@@ -1,4 +1,4 @@
-export function stayingAlive(board: [number][], x: number, y: number): boolean {
+export function stayingAlive(board: [number][] | number[][], x: number, y: number): boolean {
   // console.log(board, x, y);
   const size = board.length - 1;
   const alive = !!board[y][x];
