@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import React, { useCallback, useEffect, useState } from 'react';
 import Tile from '../Tile';
 import { useRecoilState } from 'recoil';
-import { boardAtom } from '../../state/atoms';
+import { boardAtom, savedBoardAtom } from '../../state/atoms';
 import { replaceItemAtIndex } from '../../utils/replace';
 import { stayingAlive } from './Grid.utils';
 import { Button } from '@material-ui/core';
@@ -20,7 +20,7 @@ const Container = styled.div`
   display: flex;
   border-top: 1px solid;
   border-left: 1px solid;
-  border-color: #282c34;
+  border-color: #ccc;
   flex-direction: column;
 `;
 
@@ -29,22 +29,37 @@ const Row = styled.div`
   flex-direction: row;
 `;
 
+const ButtonWrapper = styled(Row)`
+  justify-content: space-evenly;
+`;
+
+const StyledButton = styled(Button)`
+  width: 200px;
+`;
+
 const Grid: React.FC = () => {
   const [board, setBoard] = useRecoilState(boardAtom);
-  const [playing,setPlaying] = useState(false);
+  const [savedBoard, setSavedBoard] = useRecoilState(savedBoardAtom);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
   const changeTileState = useCallback(
     (alive: boolean, x: number, y: number) => {
-      setBoard((prevBoard) => {
-        const newBoard = prevBoard.slice(0);
-        newBoard[y] = replaceItemAtIndex(newBoard[y], x, alive ? 1 : 0) as [number];
-        return newBoard as [number][];
-      });
+      !hasStarted &&
+        setBoard((prevBoard) => {
+          const newBoard = prevBoard.slice(0);
+          newBoard[y] = replaceItemAtIndex(newBoard[y], x, alive ? 1 : 0) as [number];
+          return newBoard as [number][];
+        });
     },
-    [setBoard]
+    [hasStarted, setBoard]
   );
 
   const calculateNextGeneration = useCallback(() => {
+    if (!hasStarted) {
+      setHasStarted(true);
+      setSavedBoard(board.slice(0));
+    }
     setBoard((prevBoard) => {
       const newBoard = prevBoard.slice(0);
       prevBoard.forEach((row, y) => {
@@ -54,11 +69,23 @@ const Grid: React.FC = () => {
       });
       return newBoard as [number][];
     });
-  }, [setBoard]);
+  }, [board, hasStarted, setBoard, setSavedBoard]);
 
-  const togglePlay = ()=> {
-
-  }
+  const resetBoard = useCallback(() => {
+    setHasStarted(false);
+    setPlaying(false);
+    setBoard(savedBoard.slice(0));
+  }, [savedBoard, setBoard]);
+  useEffect(() => {
+    const interval =
+      playing &&
+      setInterval(() => {
+        calculateNextGeneration();
+      }, 50);
+    return () => {
+      typeof interval !== 'boolean' && clearInterval(interval);
+    };
+  }, [calculateNextGeneration, playing]);
 
   useEffect(() => {
     changeTileState(true, 8, 8);
@@ -78,8 +105,17 @@ const Grid: React.FC = () => {
           </Row>
         ))}
       </Container>
-      <Button onClick={calculateNextGeneration}>Next Generation</Button>
-      <Button onClick={togglePlay}>Next Generation</Button>
+      <ButtonWrapper>
+        <StyledButton onClick={calculateNextGeneration} disabled={playing}>
+          Next Generation
+        </StyledButton>
+        <StyledButton onClick={() => setPlaying(!playing)}>
+          {playing ? 'Stop' : 'Evolve'}
+        </StyledButton>
+        <StyledButton onClick={() => resetBoard()} disabled={!hasStarted}>
+          Reset
+        </StyledButton>
+      </ButtonWrapper>
     </Wrapper>
   );
 };

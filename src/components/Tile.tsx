@@ -8,7 +8,7 @@ const StyledTile = styled.div<{ alive: boolean }>`
   height: 20px;
   border-bottom: 1px solid;
   border-right: 1px solid;
-  border-color: #282c34;
+  border-color: #ccc;
   background-color: ${({ alive }) => (alive ? blue.A100 : 'transparent')};
   transition: background-color 0.2s;
 `;
